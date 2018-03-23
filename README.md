@@ -2,8 +2,6 @@
 
 ### 2018-03-22 
 > 有了想用node实现一个简单网站的想法，第一天也就是简单的新建项目（koa2 mySite）
-<br/>
-### 2018-03-22 
 ### 2018-03-23
 > 创建 views - users 相关的页面（login register edit_pwd)
 > 创建 sql_model - users.js mysql数据库用户模型
