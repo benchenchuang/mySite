@@ -1,3 +1,46 @@
 <%- include('../components/header.ejs') %>
-    <p>注册</p>
+<div class="am-g myapp-login">
+    <div class="myapp-login-logo-block  tpl-login-max">
+        <div class="myapp-login-logo-text">
+            <div class="myapp-login-logo-text">
+                <span> 注册</span> <i class="am-icon-skyatlas"></i>
+            </div>
+        </div>
+
+        <div class="login-font">
+        </div>
+        <div class="am-u-sm-10 login-am-center">
+            <form class="am-form">
+                <fieldset>
+                    <div class="am-form-group">
+                        <input type="text" autocomplete="off" name="username" placeholder="输入用户名">
+                    </div>
+                    <div class="am-form-group">
+                        <input type="password"  name="password" placeholder="输入密码">
+                    </div>
+                    <div class="am-form-group">
+                        <input type="password"  name="repassword" placeholder="重复密码">
+                    </div>
+                    <p><button type="button" class="am-btn am_submit am-btn-default">注册</button></p>
+                    <p><a href="/admin/login" class="am-btn am-btn-default btn-default">登录</a></p>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
 <%- include('../components/footer.ejs') %>
+<script>
+    $('.am_submit').click(function(){
+        var formData=$('form.am-form').serialize();
+        $.post('/admin/register',formData,function(res){
+            if(res.status==2){
+                alertModel(res.data);
+                setTimeout(function(){
+                    window.location.href="/admin/login"
+                },1500)
+            }else{
+                alertModel(res.data);
+            }
+        })
+    })
+</script>

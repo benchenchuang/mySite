@@ -3,12 +3,24 @@ const app = new Koa()
 const ejs=require('ejs');
 const views = require('koa-views')
 const json = require('koa-json')
+const session=require('koa-session');
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 
 const index = require('./routes/index')
 
+app.keys=['me session'];
+const setConfig={
+  key:'token',
+  maxAge:183000,
+  overwrite: true, 
+  httpOnly: true,
+  signed: true, 
+  rolling: false,
+}
+
+app.use(session(setConfig,app));
 // error handler
 onerror(app)
 

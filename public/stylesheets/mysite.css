@@ -1,0 +1,24 @@
+.tip_model{
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    max-width: 300px;
+    transform: translate(-50%,-50%);   
+    -webkit-transform: translate(-50%,-50%);
+    padding:10px 20px;
+    background: rgba(0,0,0,.6);
+    font-size: 15px;
+    color: #fff;
+    border-radius: 10px;
+    z-index: 9999;
+  }
+#code{
+    position: absolute;
+    top: 30px;
+    right: 10px;
+}
+.btn-default{
+    display: block;
+    background: #0e90d2!important;
+    color: #fff!important;
+}
