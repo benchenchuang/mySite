@@ -1,0 +1,137 @@
+<%- include('../components/header.ejs') %>
+<link rel="stylesheet" href="/stylesheets/bootstrap.min.css"/>
+<style>
+    .pagination{
+        float: right;
+        font-size: 14px;
+    }
+</style>
+<%- include('../components/section_header.ejs') %>
+<%- include('../components/section_tabs.ejs') %>
+        <div class="tpl-content-wrapper">
+                <div class="tpl-portlet-components">
+                    <div class="portlet-title">
+                        <div class="caption font-green bold">
+                            <span class="am-icon-code"></span> 会员管理
+                        </div>
+                    </div>
+                    <div class="tpl-block">
+                        <div class="am-g">
+                            <div class="am-u-sm-12 am-u-md-6">
+                                <div class="am-btn-toolbar">
+                                    <div class="am-btn-group am-btn-group-xs">
+                                        <!-- <button type="button" class="am-btn am-btn-default am-btn-success"><span class="am-icon-plus"></span> 新增</button>
+                                        <button type="button" class="am-btn am-btn-default am-btn-secondary"><span class="am-icon-save"></span> 保存</button>
+                                        <button type="button" class="am-btn am-btn-default am-btn-warning"><span class="am-icon-archive"></span> 审核</button> -->
+                                        <% if(user.access==1){ %>
+                                            <button type="button" class="am-btn am-btn-default am-btn-danger" id="del_customer"><span class="am-icon-trash-o"></span> 删除</button>
+                                        <% }else{ %>
+                                            <button onclick="alertModel('暂无权限')" type="button" class="am-btn am-btn-default"><span class="am-icon-trash-o"></span> 删除</button>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="am-u-sm-12 am-u-md-3">
+                                <div class="am-input-group am-input-group-sm">
+                                    <input type="text" class="am-form-field">
+                                    <span class="am-input-group-btn">
+                                        <button class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search" type="button"></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="am-g">
+                            <div class="am-u-sm-12">
+                                <form class="am-form">
+                                    <table class="am-table am-table-striped am-table-hover table-main">
+                                        <thead>
+                                            <tr>
+                                                <th class="table-check"><input type="checkbox" class="tpl-table-fz-check"></th>
+                                                <th class="table-id">序号</th>
+                                                <th class="table-title">用户名</th>
+                                                <th class="table-title">手机号</th>
+                                                <th class="table-type">类别</th>
+                                                <th class="table-author am-hide-sm-only">注册日期</th>
+                                                <th class="table-set">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% customers.forEach(function(customer,index){%>
+                                                <tr>
+                                                    <td><input type="checkbox" name="customer" value="<%= customer.id %>"></td>
+                                                    <td><%= index+1 %></td>
+                                                    <td><a><%= customer.username %></a></td>
+                                                    <td><a><%= customer.phone %></a></td>
+                                                    <td>
+                                                        <% if(customer.access){%>
+                                                            管理员
+                                                        <% }else{%>
+                                                            会员
+                                                        <%} %>
+                                                    </td>
+                                                    <td class="am-hide-sm-only"><%= customer.sign_time %></td>
+                                                    <td>
+                                                        <div class="am-btn-toolbar">
+                                                            <div class="am-btn-group am-btn-group-xs">
+                                                                <% if(user.access){%>
+                                                                    <button class="am-btn am-btn-default am-btn-xs am-text-secondary"><span class="am-icon-pencil-square-o"></span> 编辑</button>
+                                                                    <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span class="am-icon-trash-o"></span> 删除</button>
+                                                                    <% }else{%>
+                                                                    <button class="am-btn am-btn-default am-btn-xs am-text-primary am-hide-sm-only"><span class="am-icon-eye"></span> 查看</button>
+                                                                <%} %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+
+                                    <div id="paginations" class="am-pagination-right pagination">
+                                    </div>
+                                    <div style="clear:both"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+<%- include('../components/footer.ejs') %>
+<script src="/javascripts/jqpaginator.min.js"></script>
+<script>
+    var customers,totals,thisPage,limit=2;
+
+    $.get('/admin/customers',function(res){
+        if(res.status==2){
+            customers=res.data.customers;
+            totals=Math.ceil(customers.length/limit);
+            $('#paginations').jqPaginator({
+                totalPages: totals,
+                visiblePages: 5,
+                currentPage: 1,
+                prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                page: `<li class="page"><a href="javascript:;">{{page}}</a></li>`,
+                onPageChange: function (num) {
+                    $.get('/admin/customers',{page:num,limit:limit},function(res){
+                        console.log(res)
+                    })
+                }
+            });
+        }else{
+            alertModel('会员信息获取失败')
+        }
+    })
+
+    $('#del_customer').click(function(){
+        var formData=$('form.am-form').serialize();
+        $.post('/admin/customer/delete',formData,function(res){
+            alertModel(res.data);
+            setTimeout(function(){
+                window.location.reload();
+            },1500);
+        })
+    });
+    
+
+</script>

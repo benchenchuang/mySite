@@ -1,0 +1,84 @@
+<%- include('../components/header.ejs') %>
+    <%- include('../components/section_header.ejs') %>
+    <%- include('../components/section_tabs.ejs') %>
+    <div class="tpl-portlet-components">
+        <div class="portlet-title">
+            <div class="caption font-green bold">
+                <span class="am-icon-code"></span> 个人信息
+            </div>
+        </div>
+        <div class="tpl-block ">
+            <div class="am-g tpl-amazeui-form">
+                <div class="am-u-sm-12 am-u-md-9">
+                    <form class="am-form am-form-horizontal">
+                        <div class="am-form-group">
+                            <label for="user-name" class="am-u-sm-3 am-form-label">用户名 / UserName</label>
+                            <div class="am-u-sm-9">
+                                <input type="text" name="user_name" value="<%= user.username %>" disabled>
+                                <input type="hidden" name="user_id" value="<%= user.id %>">
+                                <small>用户名用于登录，不可以修改</small>
+                            </div>
+                        </div>
+
+                        <div class="am-form-group">
+                            <label for="user-name" class="am-u-sm-3 am-form-label">权限 / Access</label>
+                            <div class="am-u-sm-9">
+                                <input type="text" name="user_access" value="<%= user.access %>" disabled>
+                                <small>0:普通管理者,1:高级管理者</small>
+                            </div>
+                        </div>
+
+                        <div class="am-form-group">
+                            <label for="user-email" class="am-u-sm-3 am-form-label">电子邮件 / Email</label>
+                            <div class="am-u-sm-9">
+                                <input type="email" name="user_email" placeholder="输入你的电子邮件 / Email" value="<%= user.email %>">
+                                <small>邮箱你懂得...</small>
+                            </div>
+                        </div>
+
+                        <div class="am-form-group">
+                            <label for="user-phone" class="am-u-sm-3 am-form-label">电话 / Telephone</label>
+                            <div class="am-u-sm-9">
+                                <input type="tel" name="user_phone" placeholder="输入你的电话号码 / Telephone" value="<%= user.phone %>">
+                            </div>
+                        </div>
+
+                        <div class="am-form-group">
+                            <label for="user-QQ" class="am-u-sm-3 am-form-label">QQ</label>
+                            <div class="am-u-sm-9">
+                                <input type="number" pattern="[0-9]*" name="user_qq" placeholder="输入你的QQ号码" value="<%= user.qq %>">
+                            </div>
+                        </div>
+
+                        <div class="am-form-group">
+                            <label for="user-intro" class="am-u-sm-3 am-form-label">简介 / Intro</label>
+                            <div class="am-u-sm-9">
+                                <textarea class="" rows="5" name="user_bio" placeholder="输入个人简介"><%= user.bio %></textarea>
+                                <small>250字以内写出你的一生...</small>
+                            </div>
+                        </div>
+
+                        <div class="am-form-group">
+                            <div class="am-u-sm-9 am-u-sm-push-3">
+                                <button type="button" class="am-btn am-btn-primary">保存修改</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<%- include('../components/footer.ejs') %>
+<script>
+    $('.am-btn').click(function(){
+        var formData=$('form.am-form').serialize();
+        $.post('/admin/info',formData,function(res){
+            alertModel(res.data);
+            if(res.status==2){
+                setTimeout(function(){
+                    window.location.reload();
+                },1500)
+            }
+        })
+    })
+</script>

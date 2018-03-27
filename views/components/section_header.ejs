@@ -1,0 +1,33 @@
+<header class="am-topbar am-topbar-inverse admin-header">
+    <div class="am-topbar-brand">
+        <a href="/admin" class="tpl-logo">
+            <img src="/images/logo.png" alt="">
+        </a>
+    </div>
+
+    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only" data-am-collapse="{target: '#topbar-collapse'}"><span class="am-sr-only">导航切换</span> <span class="am-icon-bars"></span></button>
+    
+    <div class="am-collapse am-topbar-collapse" id="topbar-collapse">
+        <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list tpl-header-list">
+            <% if(user){ %>
+                <li class="am-dropdown">
+                    <a class="am-dropdown-toggle tpl-header-list-link" href="/admin/info">
+                            用户名：
+                            <% if(user.avator){ %>
+                            <img class="header_avator" src="/uploads/<%= user.avator %>"/>
+                            <% } %>
+                            <span class="tpl-header-list-user-nick"><%= user.username %></span>
+                    </a>
+                </li>
+                <a href="/admin/out" class="tpl-header-list-link">退出 <span class="am-icon-sign-out tpl-header-list-ico-out-size"></span></a>
+            <% }else{ %>
+                <a class="am-dropdown-toggle tpl-header-list-link" href="/admin/login">
+                    <span class="tpl-header-list-user-nick">登录</span>
+                </a>
+                <a class="am-dropdown-toggle tpl-header-list-link" href="/admin/register">
+                    <span class="tpl-header-list-user-nick">注册</span>
+                </a>
+            <% } %>
+        </ul>
+    </div>
+</header>

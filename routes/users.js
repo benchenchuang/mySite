@@ -124,11 +124,82 @@ const getCode=async (ctx,next)=>{
   ctx.response.type="image/png";
   ctx.body=imgbase64;
 }
+//退出
+const getOut=async (ctx,next)=>{
+  ctx.session.user="";
+  return ctx.redirect('/admin/login');
+};
+//修改信息
+const getInfo=async (ctx,next)=>{
+  await ctx.render('users/info', {
+      title: '我的信息',
+      user:ctx.session.user,
+      index:9
+    })
+};
+const postInfo=async (ctx,next)=>{
+  let userInfo=ctx.request.body;
+  let id=userInfo.user_id;
+  let email=userInfo.user_email;
+  let phone=userInfo.user_phone;
+  let qq=userInfo.user_qq;
+  let bio=userInfo.user_bio;
+  console.log(bio)
+  //邮箱正则
+  let emailExp=/^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/;
+  try{
+    if(!id){
+      throw new Error('用户信息不正确')
+    }
+    if(phone && phone.length!=11){
+      throw new Error('手机号不正确')
+    }
+    if(email && emailExp.test(email)){
+      throw new Error('邮箱格式不正确')
+    }
+  }catch(e){
+    return ctx.body={
+      status:0,
+      data:e.message
+    }
+  }
+  await UserModel.findById(id).then(async res=>{
+    if(res.length){
+        await UserModel.updateUserInfo([phone,email,qq,bio,moment().format('YYYY-MM-DD HH:mm:ss'),id]).then(async res=>{
+          if(res.serverStatus==2){
+            var userInfo=await UserModel.findById(id);
+            userInfo[0].password='';
+            ctx.session.user=userInfo[0];
+            console.log(userInfo[0])
+            return ctx.body={
+              status:2,
+              data:"更新成功"
+            }
+          }else{
+            return ctx.body={
+              status:3,
+              data:"更新错误"
+            }
+          }
+        })
+    }else{
+      return ctx.body={
+        status:4,
+        data:"用户不存在"
+      }
+    }
+    
+  })
+
+}
 
 module.exports={
   getLogin,
   postLogin,
   getRegister,
   postRegister,
-  getCode
+  getCode,
+  getOut,
+  getInfo,
+  postInfo
 }

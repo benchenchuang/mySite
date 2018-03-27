@@ -13,7 +13,7 @@ const index = require('./routes/index')
 app.keys=['me session'];
 const setConfig={
   key:'token',
-  maxAge:183000,
+  maxAge:18300000,
   overwrite: true, 
   httpOnly: true,
   signed: true, 
