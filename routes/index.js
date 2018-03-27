@@ -1,8 +1,9 @@
 const router = require('koa-router')();
 const Check=require('../middlewares/check');
 const Home=require('./home');
-const Users=require('./users')
-const Customer=require('./customer')
+const Users=require('./users');
+const Customer=require('./customer');
+const Article=require('./article')
 
 router.get('/admin',Check.checkLogin,Home.getHome)
 // 登录
@@ -19,11 +20,20 @@ router.get('/admin/out',Users.getOut);
 router.get('/admin/info',Users.getInfo);
 router.post('/admin/info',Users.postInfo);
 //会员管理
-router.get('/admin/customer',Customer.customerModel);
-router.get('/admin/customers',Customer.getCustomers);
+router.get('/admin/customers',Customer.customerModel);
+router.get('/admin/customersData',Customer.getCustomers);
+router.get('/admin/customer',Customer.getCustomer);
 //删除会员
 router.post('/admin/customer/delete',Customer.deleteCustomer);
 
+//显示文章分类
+router.get('/admin/article/sort',Article.getSort);
+router.post('/admin/article/create',Article.createSort);
+router.get('/admin/article/sorts',Article.getSorts);
+//删除分类
+router.post('/admin/sort/delete',Article.deleteSort);
+router.get('/admin/sort/desc',Article.sortDesc);
+router.post('/admin/sort/update',Article.updateSort)
 
 //地址错误
 router.get('/*', async(ctx, next) => {

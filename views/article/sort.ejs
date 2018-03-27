@@ -1,0 +1,276 @@
+<%- include('../components/header.ejs') %>
+<link rel="stylesheet" href="/stylesheets/bootstrap.min.css"/>
+<style>
+    .pagination{
+        float: right;
+        font-size: 14px;
+    }
+    .am-modal{
+        display:block;
+        opacity: 1;
+    }
+    .am-modal-bd{
+        text-align: left;
+        padding: 10px 40px;
+        font-size: 12px;
+    }
+    #add_block{
+        display: none;
+    }
+    #add_block .tpl-block,
+    .user_info,
+    .sort_block{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        width: 540px;
+        z-index: 3999;
+        background: #fff;
+    }
+    #add_block .tpl-amazeui-form{
+        padding-top: 30px;
+    }
+    .am-modal-hd{
+        text-align: center;
+    }
+
+    .am-form-horizontal .am-form-label{
+        padding-top: 0;
+    }
+</style>
+<%- include('../components/section_header.ejs') %>
+<%- include('../components/section_tabs.ejs') %>
+        <div class="tpl-content-wrapper">
+                <div class="tpl-portlet-components">
+                    <div class="portlet-title">
+                        <div class="caption font-green bold">
+                            <span class="am-icon-code"></span> 分类管理
+                        </div>
+                    </div>
+                    <div class="tpl-block">
+                        <div class="am-g">
+                            <div class="am-u-sm-12 am-u-md-6">
+                                <div class="am-btn-toolbar">
+                                    <div class="am-btn-group am-btn-group-xs">
+                                        <button type="button" class="am-btn am-btn-default am-btn-success" id="add_btn"><span class="am-icon-plus"></span> 新增</button>
+                                        <button type="button" class="am-btn am-btn-default am-btn-danger" id="del_customer"><span class="am-icon-trash-o"></span> 删除</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="am-g">
+                            <div class="am-u-sm-12">
+                                <form class="am-form">
+                                    <table class="am-table am-table-striped am-table-hover table-main">
+                                        <thead>
+                                            <tr>
+                                                <th class="table-check"><input type="checkbox" class="tpl-table-fz-check"></th>
+                                                <th class="table-id">序号</th>
+                                                <th class="table-title">分类名称</th>
+                                                <th class="table-title">创建时间</th>
+                                                <th class="table-set">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody">
+                                            
+                                        </tbody>
+                                    </table>
+
+                                    <div id="paginations" class="am-pagination-right pagination">
+                                    </div>
+                                    <div style="clear:both"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <div id="showInfo"></div>
+        <div id="alertInfo"></div>
+
+        <div id="add_block">
+            <div class="tpl-block " >
+                <div class="am-modal-hd">添加分类
+                    <a href="javascript: void(0)" class="am-close am-close-spin" id="add_close">&times;</a>
+                </div>
+                <div class="am-g tpl-amazeui-form">
+                    <div class="am-u-sm-12 am-u-md-9">
+                        <form class="am-form am-form-horizontal" id="sort_form">
+                            <div class="am-form-group">
+                                <label for="user-name" class="am-u-sm-3 am-form-label">分类名称 / Name</label>
+                                <div class="am-u-sm-9">
+                                    <input type="text" name="sort_name" value="" >
+                                </div>
+                            </div>
+                            <div class="am-form-group">
+                                <div class="am-u-sm-9 am-u-sm-push-3">
+                                    <button type="button" id="create_sort" class="am-btn am-btn-primary">添加分类</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="am-dimmer am-active" data-am-dimmer="" style="display: block;"></div>
+        </div>
+
+<%- include('../components/footer.ejs') %>
+<script src="/javascripts/jqpaginator.min.js"></script>
+<script>
+    var totals,limit=10,index=0;
+
+    $.get('/admin/article/sorts',function(res){
+        if(res.status==2){
+            totals=Math.ceil(res.counts/limit);
+            $('#paginations').jqPaginator({
+                totalPages: totals,
+                visiblePages: 5,
+                currentPage: 1,
+                prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                page: `<li class="page"><a href="javascript:;">{{page}}</a></li>`,
+                onPageChange: function (num) {
+                    $.get('/admin/article/sorts',{page:num,limit:limit},function(res){
+                        var trData='';
+                        var multiple=(num-1)*limit;
+                        res.data.forEach(function(item,index){
+                            trData+=`<tr>
+                                <td><input type="checkbox" name="sort" value="${item.id}"></td>
+                                <td>${index+1+multiple}</td>
+                                <td><a>${item.name}</a></td>
+                                <td class="am-hide-sm-only">${item.create_time}</td>
+                                <td>
+                                    <div class="am-btn-toolbar">
+                                        <div class="am-btn-group am-btn-group-xs">
+                                            <button type="button" onclick="getSort(${item.id},true)" class="am-btn am-btn-default am-btn-xs am-text-secondary"><span class="am-icon-pencil-square-o"></span> 编辑</button>
+                                            <button type="button" data-am-modal="{target: '#my-alert'}" onclick="delSort(${item.id})" class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span class="am-icon-trash-o"></span> 删除</button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>`;
+                            
+                        });
+                        $("#tbody").html(trData);
+                    })
+                }
+            });
+        }else{
+            alertModel('会员信息获取失败')
+        }
+    })
+    
+    $('#del_customer').click(function(){
+        var formData=$('form.am-form').serialize();
+        $.post('/admin/sort/delete',formData,function(res){
+            alertModel(res.data);
+            setTimeout(function(){
+                window.location.reload();
+            },1500);
+        })
+    });
+
+    //获取用户详细信息
+    function getSort(id,isEdit){
+        var progress = $.AMUI.progress;
+        progress.start();
+        $.get('/admin/sort/desc?id='+id,function(data){
+            var showHtml='';
+            var sortInfo=data.data[0];
+            showHtml=`<div class="tpl-block sort_block" >
+                    <div class="am-modal-hd">添加分类
+                        <a href="javascript: void(0)" class="am-close am-close-spin" id="add_close">&times;</a>
+                    </div>
+                    <div class="am-g tpl-amazeui-form">
+                        <div class="am-u-sm-12 am-u-md-9">
+                            <form class="am-form am-form-horizontal" id="sort_box">
+                                <div class="am-form-group">
+                                    <label for="user-name" class="am-u-sm-3 am-form-label">分类名称 / Name</label>
+                                    <div class="am-u-sm-9">
+                                        <input type="text" name="sort" value="${sortInfo.name}" >
+                                        <input type="hidden" name="id" value="${sortInfo.id}">
+                                    </div>
+                                </div>
+                                <div class="am-form-group">
+                                    <div class="am-u-sm-9 am-u-sm-push-3">
+                                        <button type="button" id="edit_sort" class="am-btn am-btn-primary">添加分类</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="am-dimmer am-active" data-am-dimmer="" style="display: block;"></div>`;
+            progress.done();
+            $("#showInfo").html(showHtml);
+        });
+    };
+
+    $(document).on('click','.am-close',function(){
+        $("#showInfo").html('');
+    });
+
+    //删除用户
+    function delSort(id){
+        var alertHtml=`<div class="am-modal am-modal-alert" tabindex="-1" id="my-alert">
+                            <div class="am-modal-dialog">
+                                <div class="am-modal-hd">操作提示</div>
+                                <div class="am-modal-bd" style="text-align:center;">
+                                    确定删除此用户？
+                                </div>
+                                <div class="am-modal-footer">
+                                    <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+                                    <span class="am-modal-btn" id="del_control">确定</span>
+                                </div>
+                            </div>
+                        </div>`
+        $("#alertInfo").html(alertHtml);
+        $(document).on('click','#del_control',function(){
+            $.post('/admin/sort/delete',{sort:id},function(res){
+                alertModel(res.data)
+                if(res.status==2){
+                    setTimeout(function(){
+                        window.location.reload();
+                    },1500);
+                }
+            })
+        });
+    }
+
+    $("#add_btn").click(function(){
+        $("#add_block").show();
+    });
+    $("#add_close").click(function(){
+        $("#add_block").hide();
+    })
+    //添加分类
+    $("#create_sort").click(function(){
+        var formData=$('form#sort_form').serialize();
+        $.post('/admin/article/create',formData,function(res){
+            if(res.status==2){
+                alertModel('添加成功');
+                setTimeout(function(){
+                    window.location.reload();
+                },1500)
+            }else{
+                alertModel(res.data);
+            }
+        })
+    });
+
+    $(document).on('click','#edit_sort',function(){
+        var formData=$(document).find('form#sort_box').serialize();
+        $.post('/admin/sort/update',formData,function(res){
+            if(res.status==2){
+                alertModel('编辑成功');
+                setTimeout(function(){
+                    window.location.reload();
+                },1500)
+            }else{
+                alertModel(res.data)
+            }
+        })
+    })
+
+
+</script>

@@ -70,7 +70,7 @@ const postRegister=async (ctx,next)=>{
   var username=formData.username;
   var password=formData.password;
   var repassword=formData.repassword;
-
+  var access=parseInt(formData.access) || 0;
   try{
     if(!username){
       throw new Error('用户名不能为空')
@@ -96,7 +96,7 @@ const postRegister=async (ctx,next)=>{
       }
     }else{
       var sign_time=moment().format('YYYY-MM-DD HH:mm:ss');
-      await UserModel.addUser([username,password,moment().format('YYYY-MM-DD HH:mm:ss')]).then(res=>{
+      await UserModel.addUser([username,password,access,moment().format('YYYY-MM-DD HH:mm:ss')]).then(res=>{
         if(res.serverStatus==2){
           return ctx.body={
             status:2,
@@ -144,10 +144,14 @@ const postInfo=async (ctx,next)=>{
   let phone=userInfo.user_phone;
   let qq=userInfo.user_qq;
   let bio=userInfo.user_bio;
-  console.log(bio)
+  let access=userInfo.user_access || ctx.session.user.access;
+      access=parseInt(access);
   //邮箱正则
   let emailExp=/^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/;
   try{
+    if(id==ctx.session.user.id && !access){
+      throw new Error('不可更改自己的权限')
+    }
     if(!id){
       throw new Error('用户信息不正确')
     }
@@ -165,7 +169,7 @@ const postInfo=async (ctx,next)=>{
   }
   await UserModel.findById(id).then(async res=>{
     if(res.length){
-        await UserModel.updateUserInfo([phone,email,qq,bio,moment().format('YYYY-MM-DD HH:mm:ss'),id]).then(async res=>{
+        await UserModel.updateUserInfo([access,phone,email,qq,bio,moment().format('YYYY-MM-DD HH:mm:ss'),id]).then(async res=>{
           if(res.serverStatus==2){
             var userInfo=await UserModel.findById(id);
             userInfo[0].password='';

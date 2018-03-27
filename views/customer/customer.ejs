@@ -5,6 +5,34 @@
         float: right;
         font-size: 14px;
     }
+    .am-modal{
+        display:block;
+        opacity: 1;
+    }
+    .am-modal-bd{
+        text-align: left;
+        padding: 10px 40px;
+        font-size: 12px;
+    }
+    #add_block{
+        display: none;
+    }
+    #add_block .tpl-block,
+    .user_info{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        width: 540px;
+        z-index: 3999;
+        background: #fff;
+    }
+    #add_block .tpl-amazeui-form{
+        padding-top: 30px;
+    }
+    .am-modal-hd{
+        text-align: center;
+    }
 </style>
 <%- include('../components/section_header.ejs') %>
 <%- include('../components/section_tabs.ejs') %>
@@ -24,6 +52,7 @@
                                         <button type="button" class="am-btn am-btn-default am-btn-secondary"><span class="am-icon-save"></span> 保存</button>
                                         <button type="button" class="am-btn am-btn-default am-btn-warning"><span class="am-icon-archive"></span> 审核</button> -->
                                         <% if(user.access==1){ %>
+                                            <button type="button" class="am-btn am-btn-default am-btn-success" id="add_btn"><span class="am-icon-plus"></span> 新增</button>
                                             <button type="button" class="am-btn am-btn-default am-btn-danger" id="del_customer"><span class="am-icon-trash-o"></span> 删除</button>
                                         <% }else{ %>
                                             <button onclick="alertModel('暂无权限')" type="button" class="am-btn am-btn-default"><span class="am-icon-trash-o"></span> 删除</button>
@@ -33,8 +62,9 @@
                             </div>
                             <div class="am-u-sm-12 am-u-md-3">
                                 <div class="am-input-group am-input-group-sm">
-                                    <input type="text" class="am-form-field">
+                                    <input type="text" class="am-form-field" placeholder="暂无查询功能">
                                     <span class="am-input-group-btn">
+                                        
                                         <button class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search" type="button"></button>
                                     </span>
                                 </div>
@@ -55,35 +85,8 @@
                                                 <th class="table-set">操作</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <% customers.forEach(function(customer,index){%>
-                                                <tr>
-                                                    <td><input type="checkbox" name="customer" value="<%= customer.id %>"></td>
-                                                    <td><%= index+1 %></td>
-                                                    <td><a><%= customer.username %></a></td>
-                                                    <td><a><%= customer.phone %></a></td>
-                                                    <td>
-                                                        <% if(customer.access){%>
-                                                            管理员
-                                                        <% }else{%>
-                                                            会员
-                                                        <%} %>
-                                                    </td>
-                                                    <td class="am-hide-sm-only"><%= customer.sign_time %></td>
-                                                    <td>
-                                                        <div class="am-btn-toolbar">
-                                                            <div class="am-btn-group am-btn-group-xs">
-                                                                <% if(user.access){%>
-                                                                    <button class="am-btn am-btn-default am-btn-xs am-text-secondary"><span class="am-icon-pencil-square-o"></span> 编辑</button>
-                                                                    <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span class="am-icon-trash-o"></span> 删除</button>
-                                                                    <% }else{%>
-                                                                    <button class="am-btn am-btn-default am-btn-xs am-text-primary am-hide-sm-only"><span class="am-icon-eye"></span> 查看</button>
-                                                                <%} %>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            <% }) %>
+                                        <tbody id="tbody">
+                                            
                                         </tbody>
                                     </table>
 
@@ -96,15 +99,68 @@
                     </div>
                 </div>
         </div>
+        <div id="showInfo"></div>
+        <div id="alertInfo"></div>
+
+        <div id="add_block">
+            <div class="tpl-block " >
+                <div class="am-modal-hd">添加用户
+                    <a href="javascript: void(0)" class="am-close am-close-spin" id="add_close">&times;</a>
+                </div>
+                <div class="am-g tpl-amazeui-form">
+                    <div class="am-u-sm-12 am-u-md-9">
+                        <form class="am-form am-form-horizontal" id="add_form">
+                            <div class="am-form-group">
+                                <label for="user-name" class="am-u-sm-3 am-form-label">用户名 / UserName</label>
+                                <div class="am-u-sm-9">
+                                    <input type="text" name="username" value="" >
+                                    <small>用户名用于登录，不可以修改</small>
+                                </div>
+                            </div>
+    
+                            <div class="am-form-group">
+                                <label for="user-name" class="am-u-sm-3 am-form-label">权限 / Access</label>
+                                <div class="am-u-sm-9">
+                                    <input type="text" name="access" value="">
+                                    <small>0:普通管理者,1:高级管理者</small>
+                                </div>
+                            </div>
+
+                            <div class="am-form-group">
+                                <label for="user-name" class="am-u-sm-3 am-form-label">密码 / Password</label>
+                                <div class="am-u-sm-9">
+                                    <input type="password" name="password" value="">
+                                    <small>用于用户登录</small>
+                                </div>
+                            </div>
+                            <div class="am-form-group">
+                                <label for="user-name" class="am-u-sm-3 am-form-label">重复 / Password</label>
+                                <div class="am-u-sm-9">
+                                    <input type="password" name="repassword" value="">
+                                </div>
+                            </div>
+    
+                            <div class="am-form-group">
+                                <div class="am-u-sm-9 am-u-sm-push-3">
+                                    <button type="button" id="add_customer" class="am-btn am-btn-primary">添加用户</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="am-dimmer am-active" data-am-dimmer="" style="display: block;"></div>
+        </div>
+
 <%- include('../components/footer.ejs') %>
 <script src="/javascripts/jqpaginator.min.js"></script>
 <script>
-    var customers,totals,thisPage,limit=2;
+    var totals,limit=10,index=0;
 
-    $.get('/admin/customers',function(res){
+    $.get('/admin/customersData',function(res){
         if(res.status==2){
-            customers=res.data.customers;
-            totals=Math.ceil(customers.length/limit);
+            customers=res.data.data;
+            totals=Math.ceil(res.data.counts/limit);
             $('#paginations').jqPaginator({
                 totalPages: totals,
                 visiblePages: 5,
@@ -113,8 +169,39 @@
                 next: '<li class="next"><a href="javascript:;">下一页</a></li>',
                 page: `<li class="page"><a href="javascript:;">{{page}}</a></li>`,
                 onPageChange: function (num) {
-                    $.get('/admin/customers',{page:num,limit:limit},function(res){
-                        console.log(res)
+                    $.get('/admin/customersData',{page:num,limit:limit},function(res){
+                        var trData='';
+                        var multiple=(num-1)*limit;
+                        res.data.data.forEach(function(item,index){
+                            var identify;
+                            if(item.access){
+                                identify='管理员'
+                            }else{
+                                identify='会员' 
+                            }
+                            trData+=`<tr>
+                                <td><input type="checkbox" name="customer" value="${item.id}"></td>
+                                <td>${index+1+multiple}</td>
+                                <td><a>${item.username}</a></td>
+                                <td><a>${item.phone}</a></td>
+                                <td>${identify}</td>
+                                <td class="am-hide-sm-only">${item.sign_time}</td>
+                                <td>
+                                    <div class="am-btn-toolbar">
+                                        <div class="am-btn-group am-btn-group-xs">
+                                            <% if(user.access){%>
+                                                <button type="button" onclick="get_customer(${item.id},true)" class="am-btn am-btn-default am-btn-xs am-text-secondary"><span class="am-icon-pencil-square-o"></span> 编辑</button>
+                                                <button type="button" data-am-modal="{target: '#my-alert'}" onclick="delCustomer(${item.id})" class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span class="am-icon-trash-o"></span> 删除</button>
+                                                <% }else{%>
+                                                <button type="button" onclick="get_customer(${item.id},false)" class="am-btn am-btn-default am-btn-xs am-text-primary am-hide-sm-only"><span class="am-icon-eye"></span> 查看</button>
+                                            <%} %>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>`;
+                            
+                        });
+                        $("#tbody").html(trData);
                     })
                 }
             });
@@ -122,7 +209,7 @@
             alertModel('会员信息获取失败')
         }
     })
-
+    
     $('#del_customer').click(function(){
         var formData=$('form.am-form').serialize();
         $.post('/admin/customer/delete',formData,function(res){
@@ -132,6 +219,155 @@
             },1500);
         })
     });
-    
+
+    //获取用户详细信息
+    function get_customer(id,isEdit){
+        var progress = $.AMUI.progress;
+        progress.start();
+        $.get('/admin/customer/?id='+id,function(data){
+            var vip,showHtml='';
+            var userInfo=data.data[0];
+            vip=userInfo.access?'管理员':'会员';
+            if(isEdit){
+                showHtml=`<div class="am-u-sm-12 am-u-md-9 user_info">
+                        <div class="am-modal-hd">用户信息
+                            <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+                        </div>
+                    <form class="am-form am-form-horizontal" id="eidt_form">
+                        <div class="am-form-group">
+                            <label for="user-name" class="am-u-sm-3 am-form-label">用户名 / UserName</label>
+                            <div class="am-u-sm-9">
+                                <input type="text" name="user_name" value="${userInfo.username}" disabled>
+                                <input type="hidden" name="user_id" value="${userInfo.id}">
+                                <small>用户名用于登录，不可以修改</small>
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="user-name" class="am-u-sm-3 am-form-label">权限 / Access</label>
+                            <div class="am-u-sm-9">
+                                <input type="text" name="user_access" value="${userInfo.access}">
+                                <small>0:普通管理者,1:高级管理者</small>
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="user-email" class="am-u-sm-3 am-form-label">电子邮件 / Email</label>
+                            <div class="am-u-sm-9">
+                                <input type="email" name="user_email" placeholder="输入你的电子邮件 / Email" value="${userInfo.email}">
+                                <small>邮箱你懂得...</small>
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="user-phone" class="am-u-sm-3 am-form-label">电话 / Telephone</label>
+                            <div class="am-u-sm-9">
+                                <input type="tel" name="user_phone" placeholder="输入你的电话号码 / Telephone" value="${userInfo.phone}">
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="user-QQ" class="am-u-sm-3 am-form-label">QQ</label>
+                            <div class="am-u-sm-9">
+                                <input type="number" pattern="[0-9]*" name="user_qq" placeholder="输入你的QQ号码" value="${userInfo.qq}">
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="user-intro" class="am-u-sm-3 am-form-label">简介 / Intro</label>
+                            <div class="am-u-sm-9">
+                                <textarea class="" rows="5" name="user_bio" placeholder="输入个人简介">${userInfo.bio}</textarea>
+                                <small>250字以内写出你的一生...</small>
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <div class="am-u-sm-9 am-u-sm-push-3">
+                                <button type="button" class="am-btn am-btn-primary" id="edit_btn">保存编辑</button>
+                            </div>
+                        </div>
+                    </form>
+                </div><div class="am-dimmer am-active" data-am-dimmer="" style="display: block;"></div>`;
+            }else{
+                showHtml=`<div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal-1">
+                    <div class="am-modal-dialog">
+                    <div class="am-modal-hd">用户信息
+                        <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+                    </div>
+                    <div class="am-modal-bd">
+                        <p>用户名：${userInfo.username}</p>
+                        <p>手机号：${userInfo.phone}</p>
+                        <p>类  别：${vip}</p>
+                        <p>email：${userInfo.email}</p>
+                        <p>qq：${userInfo.qq}</p>
+                        <p>简介：${userInfo.bio}</p>
+                        <p>注册时间：${userInfo.sign_time}</p>
+                    </div>
+                    </div>
+                </div><div class="am-dimmer am-active" data-am-dimmer="" style="display: block;"></div>`;
+            }
+            progress.done();
+            $("#showInfo").html(showHtml);
+        });
+    };
+    $(document).on('click','.am-close',function(){
+        $("#showInfo").html('');
+    });
+
+    //删除用户
+    function delCustomer(id){
+        var alertHtml=`<div class="am-modal am-modal-alert" tabindex="-1" id="my-alert">
+                            <div class="am-modal-dialog">
+                                <div class="am-modal-hd">操作提示</div>
+                                <div class="am-modal-bd" style="text-align:center;">
+                                    确定删除此用户？
+                                </div>
+                                <div class="am-modal-footer">
+                                    <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+                                    <span class="am-modal-btn" id="del_control">确定</span>
+                                </div>
+                            </div>
+                        </div>`
+        $("#alertInfo").html(alertHtml);
+        $(document).on('click','#del_control',function(){
+            $.post('/admin/customer/delete',{customer:id},function(res){
+                alertModel(res.data)
+                if(res.status==2){
+                    setTimeout(function(){
+                        window.location.reload();
+                    },1500);
+                }
+            })
+        });
+    }
+    $("#add_btn").click(function(){
+        $("#add_block").show();
+    });
+    $("#add_close").click(function(){
+        $("#add_block").hide();
+    })
+    //添加新用户
+    $("#add_customer").click(function(){
+        var formData=$('form#add_form').serialize();
+        $.post('/admin/register',formData,function(res){
+            if(res.status==2){
+                alertModel('添加成功');
+                setTimeout(function(){
+                    window.location.reload();
+                },1500)
+            }else{
+                alertModel(res.data);
+            }
+        })
+    });
+
+    $(document).on('click','#edit_btn',function(){
+        var formData=$(document).find('form#eidt_form').serialize();
+        $.post('/admin/info',formData,function(res){
+            if(res.status==2){
+                alertModel('编辑成功');
+                setTimeout(function(){
+                    window.location.reload();
+                },1500)
+            }else{
+                alertModel(res.data)
+            }
+        })
+    })
+
 
 </script>
