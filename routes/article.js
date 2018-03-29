@@ -168,9 +168,9 @@ const getArticleList=async (ctx,next)=>{
     let thisPage=parseInt(ctx.request.query.page || 1);
     let limit =parseInt(ctx.request.query.limit || 10);
     let sort =parseInt(ctx.request.query.sort);
+    let title =ctx.request.query.title;
     let startCount=(thisPage-1)*limit;
-    console.log(startCount,limit,sort)
-    let getData=await ArticleModel.getFewArticles(startCount,limit,sort);
+    let getData=await ArticleModel.getFewArticles(startCount,limit,sort,title);
     return ctx.body={
         status:2,
         data:getData,

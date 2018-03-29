@@ -37,8 +37,8 @@
             </div>
             <div class="am-u-sm-12 am-u-md-3">
                 <div class="am-input-group am-input-group-sm">
-                    <input type="text" class="am-form-field" placeholder="输入查询的文章标题">
-                    <span class="am-input-group-btn"><button class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search" type="button"></button></span>
+                    <input type="text" id="search_title" class="am-form-field" placeholder="输入查询的文章标题">
+                    <span class="am-input-group-btn"><button id="search_btn" class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search" type="button"></button></span>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
 <%- include('../components/footer.ejs') %>
 <script src="/javascripts/jqpaginator.min.js"></script>
 <script>
-    var totals,limit=10,index=0;
+    var totals,indexSort,limit=10,index=0;
     //获取文章分类
     $.get('/admin/article/sorts',{limit:20},function(res){
         var resData=res.data;
@@ -71,12 +71,18 @@
     });
     //筛选分类
     $('#select_sort').change(function(){
-        var indexSort=$(this).val();
-        getArticleList('/admin/article/all',indexSort)
+        indexSort=$(this).val();
+        var title=$('#search_title').val();
+        getArticleList('/admin/article/all',indexSort,title)
     });
+    //搜索
+    $('#search_btn').click(function(){
+        var title=$('#search_title').val();
+        getArticleList('/admin/article/all',indexSort,title)
+    })
 
     getArticleList('/admin/article/all');
-    function getArticleList(url,sort){
+    function getArticleList(url,sort,title){
         $.get(url,function(res){
             if(res.status==2){
                 customers=res.data;
@@ -89,7 +95,7 @@
                     next: '<li class="next"><a href="javascript:;">下一页</a></li>',
                     page: `<li class="page"><a href="javascript:;">{{page}}</a></li>`,
                     onPageChange: function (num) {
-                        $.get(url,{page:num,limit:limit,sort:sort},function(res){
+                        $.get(url,{page:num,limit:limit,sort:sort,title:title},function(res){
                             var trData='';
                             var multiple=(num-1)*limit;
                             res.data.forEach(function(item,index){
