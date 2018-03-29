@@ -1,0 +1,122 @@
+<%- include('../components/header.ejs') %>
+<%- include('../components/section_header.ejs') %>
+<%- include('../components/section_tabs.ejs') %>
+<link rel="stylesheet" href="stylesheets/wangEditor.min.css">
+<style>
+    #editor{
+        min-width: 800px;
+        overflow: scroll;
+        border: none;
+        overflow: hidden;
+    }
+    .am-active>.am-dropdown-content{
+        z-index: 99999;
+    }
+</style>
+        <div class="tpl-content-wrapper tpl-portlet-components">
+            <div class="tpl-block">
+                <div class="am-g">
+                    <div class="tpl-form-body tpl-form-line">
+                        <div class="am-form tpl-form-line-form">
+                            <div class="am-form-group">
+                                <label for="user-weibo" class="am-u-sm-3 am-form-label">封面图 <span class="tpl-form-line-small-title">Images</span></label>
+                                <div class="am-u-sm-9">
+                                    <div class="am-form-group am-form-file">
+                                        <form id="file_form" method="post" enctype="multipart/form-data">
+                                            <div class="tpl-form-file-img">
+                                                <img src="/images/default.png" alt="">
+                                            </div>
+                                            <button type="button" class="am-btn am-btn-danger am-btn-sm"><i class="am-icon-cloud-upload"></i> 添加封面图片</button>
+                                            <input name="pic" type="file" id="file">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form id="article_form">
+                                <input id="upload_pic" name="pic" type="hidden" value="">
+                                <div class="am-form-group">
+                                    <label for="user-name" class="am-u-sm-3 am-form-label">标题 <span class="tpl-form-line-small-title">Title</span></label>
+                                    <div class="am-u-sm-9">
+                                        <input type="text" class="tpl-form-input" name="title" placeholder="请输入标题文字">
+                                        <small>请填写标题文字10-20字左右。</small>
+                                    </div>
+                                </div>
+    
+                                <div class="am-form-group">
+                                    <label for="user-weibo" class="am-u-sm-3 am-form-label">添加分类 <span class="tpl-form-line-small-title">Type</span></label>
+                                    <div class="am-u-sm-9">
+                                        <select id="select_sort" name="sort" data-am-selected="{btnSize: 'sm'}" style="display: none;">
+                                        </select>
+                                    </div>
+                                </div>
+    
+                                <div class="am-form-group">
+                                    <label for="user-intro" class="am-u-sm-3 am-form-label">文章内容</label>
+                                    <div class="am-u-sm-9">
+                                        <div id="editor" name="editor" name="editor"></div>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <div class="am-form-group">
+                                <div class="am-u-sm-9 am-u-sm-push-3">
+                                    <button type="button" id="submit_article" class="am-btn am-btn-primary tpl-btn-bg-color-success ">发布文章</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div> 
+        </div>
+        
+
+<%- include('../components/footer.ejs') %>
+<script src="//unpkg.com/wangeditor/release/wangEditor.min.js"></script>
+<script>
+    var editor = new window.wangEditor('#editor');
+     $(function () {
+        editor.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
+        editor.create();
+    });
+    //获取文章分类
+    $.get('/admin/article/sorts',{limit:20},function(res){
+        var resData=res.data;
+        var optionHtml='';
+        resData.forEach(function(item){
+            optionHtml+=`<option value="${item.id}">${item.name}</option>`
+        })
+        $('#select_sort').html(optionHtml);
+    });
+    //上传头图
+    $("#file").change(function(){
+        var file=new FormData(document.getElementById("file_form"));
+        $.ajax({
+            type:"post",
+            url: '/admin/upload/pic',
+            data:file,
+            contentType:false,
+            processData:false,
+            success:function(res){
+                console.log(res)
+                if(res.status==2){
+                    var pic=res.data.pic;
+                    $('.tpl-form-file-img img').attr('src','/uploads/'+pic);
+                    $('.upload_pic').val(pic);
+                }
+                alertModel(res.data.info);
+            },
+            error:function(err){
+                alertModel(err.statusText);
+            }
+        });
+    });
+    //发布文章
+    $('#submit_article').click(function(){
+        var formData=$('form#article_form').serialize();
+        var htmlData=editor.txt.html();
+        var article=formData+"&conetnt="+htmlData;
+    })
+
+</script>

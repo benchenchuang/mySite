@@ -98,6 +98,27 @@ const updateSort=async (ctx,next)=>{
         }
     })
 }
+const showArticleList=async (ctx,next)=>{
+    return ctx.render('article/article_list',{
+        title:'文章管理列表',
+        user:ctx.session.user,
+        index:7
+    });
+}
+const addArticle=async (ctx,next)=>{
+    return ctx.render('article/article',{
+        title:"添加文章",
+        user:ctx.session.user,
+        index:7
+    })
+};
+
+const submitArticle=async (ctx,next)=>{
+    var formData=ctx.request.body;
+    console.log(formData);
+}
+
+
 
 module.exports={
     getSort,
@@ -105,5 +126,8 @@ module.exports={
     getSorts,
     deleteSort,
     sortDesc,
-    updateSort
+    updateSort,
+    showArticleList,
+    addArticle,
+    submitArticle
 }

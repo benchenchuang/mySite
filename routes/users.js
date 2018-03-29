@@ -170,15 +170,22 @@ const postInfo=async (ctx,next)=>{
   await UserModel.findById(id).then(async res=>{
     if(res.length){
         await UserModel.updateUserInfo([access,phone,email,qq,bio,moment().format('YYYY-MM-DD HH:mm:ss'),id]).then(async res=>{
+          var getUser=await UserModel.findById(id);
           if(res.serverStatus==2){
-            var userInfo=await UserModel.findById(id);
-            userInfo[0].password='';
-            ctx.session.user=userInfo[0];
-            console.log(userInfo[0])
-            return ctx.body={
-              status:2,
-              data:"更新成功"
+            if(getUser[0].username==ctx.session.user.username){
+              getUser.password='';
+              ctx.session.user=getUser[0];
+              return ctx.body={
+                status:2,
+                data:"更新成功"
+              }
+            }else{
+              return ctx.body={
+                status:2,
+                data:"更新成功"
+              }
             }
+            
           }else{
             return ctx.body={
               status:3,

@@ -3,7 +3,23 @@ const Check=require('../middlewares/check');
 const Home=require('./home');
 const Users=require('./users');
 const Customer=require('./customer');
-const Article=require('./article')
+const Article=require('./article');
+// 上传图片的中间件
+const multer=require('koa-multer');
+//配置  
+var storage = multer.diskStorage({  
+  //文件保存路径  
+  destination: function (req, file, cb) {  
+    cb(null, 'public/uploads/')  
+  },  
+  //修改文件名称  
+  filename: function (req, file, cb) {  
+    var fileFormat = (file.originalname).split(".");  
+    cb(null,Date.now() + "." + fileFormat[fileFormat.length - 1]);  
+  }  
+}) 
+//加载配置  
+var upload = multer({ storage: storage }); 
 
 router.get('/admin',Check.checkLogin,Home.getHome)
 // 登录
@@ -34,6 +50,13 @@ router.get('/admin/article/sorts',Article.getSorts);
 router.post('/admin/sort/delete',Article.deleteSort);
 router.get('/admin/sort/desc',Article.sortDesc);
 router.post('/admin/sort/update',Article.updateSort)
+//文章列表
+router.get('/admin/article/list',Article.showArticleList);
+router.get('/admin/article/new',Article.addArticle);
+//上传图片
+router.post('/admin/upload/pic',upload.single('pic'),Home.uploadPic);
+//上传文章
+router.post('/admin/')
 
 //地址错误
 router.get('/*', async(ctx, next) => {
