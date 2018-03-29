@@ -12,6 +12,10 @@
     .am-active>.am-dropdown-content{
         z-index: 99999;
     }
+    .am-form-file input[type=file]{
+        width: 400px;
+        height: 250px;
+    }
 </style>
         <div class="tpl-content-wrapper tpl-portlet-components">
             <div class="tpl-block">
@@ -22,7 +26,7 @@
                                 <label for="user-weibo" class="am-u-sm-3 am-form-label">封面图 <span class="tpl-form-line-small-title">Images</span></label>
                                 <div class="am-u-sm-9">
                                     <div class="am-form-group am-form-file">
-                                        <form id="file_form" method="post" enctype="multipart/form-data">
+                                        <form id="file_form" enctype="multipart/form-data">
                                             <div class="tpl-form-file-img">
                                                 <img src="/images/default.png" alt="">
                                             </div>
@@ -34,7 +38,7 @@
                             </div>
 
                             <form id="article_form">
-                                <input id="upload_pic" name="pic" type="hidden" value="">
+                                <input id="pic" type="hidden" name="pic">
                                 <div class="am-form-group">
                                     <label for="user-name" class="am-u-sm-3 am-form-label">标题 <span class="tpl-form-line-small-title">Title</span></label>
                                     <div class="am-u-sm-9">
@@ -75,7 +79,7 @@
 <%- include('../components/footer.ejs') %>
 <script src="//unpkg.com/wangeditor/release/wangEditor.min.js"></script>
 <script>
-    var editor = new window.wangEditor('#editor');
+    var img,editor = new window.wangEditor('#editor');
      $(function () {
         editor.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
         editor.create();
@@ -86,7 +90,7 @@
         var optionHtml='';
         resData.forEach(function(item){
             optionHtml+=`<option value="${item.id}">${item.name}</option>`
-        })
+        });
         $('#select_sort').html(optionHtml);
     });
     //上传头图
@@ -99,11 +103,10 @@
             contentType:false,
             processData:false,
             success:function(res){
-                console.log(res)
                 if(res.status==2){
                     var pic=res.data.pic;
                     $('.tpl-form-file-img img').attr('src','/uploads/'+pic);
-                    $('.upload_pic').val(pic);
+                    $('#pic').val(pic)
                 }
                 alertModel(res.data.info);
             },
@@ -116,7 +119,16 @@
     $('#submit_article').click(function(){
         var formData=$('form#article_form').serialize();
         var htmlData=editor.txt.html();
-        var article=formData+"&conetnt="+htmlData;
+        var articles=formData+"&content="+htmlData;
+        $.post('/admin/article/add',articles,function(data){
+            alertModel(data.data)
+            if(data.status==2){
+                setTimeout(function(){
+                    window.location.href="/admin/article/list"
+                },1000)
+            }
+        })
     })
+    
 
 </script>

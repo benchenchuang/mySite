@@ -13,7 +13,7 @@ create table if not exists articles(
     author VARCHAR(100) NOT NULL,
     title VARCHAR(100) NOT NULL,
     pic VARCHAR(100) NOT NULL,
-    content VARCHAR(100) NOT NULL,
+    content text(0) NOT NULL,
     views VARCHAR(100) NOT NULL,
     create_time VARCHAR(100) NOT NULL,
     PRIMARY KEY ( id ),

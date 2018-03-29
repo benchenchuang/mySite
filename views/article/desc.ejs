@@ -1,0 +1,42 @@
+<%- include('../components/header.ejs') %>
+<%- include('../components/section_header.ejs') %>
+<%- include('../components/section_tabs.ejs') %>
+
+    <div class="tpl-content-wrapper tpl-portlet-components">
+        <div class="tpl-block">
+            <div class="am-g" id="desc">
+                <h2 class="am-titlebar-title" style="text-align:center;">{{descInfo.title}}</h2>
+                <p class="am-list-item-text" style="text-align:center;">作者：{{descInfo.author}} 发表时间：{{descInfo.create_time}} 浏览量：<span class="am-icon-eye font-green"> {{descInfo.views}}</span></p>
+                <div v-html="descInfo.content" data-am-widget="paragraph" class="am-paragraph  am-paragraph-default">
+                </div>
+            </div>
+        </div> 
+    </div>
+<%- include('../components/footer.ejs') %>
+<script>
+    new Vue({
+        el:"#desc",
+        data:{
+            descInfo:[]
+        },
+        mounted:function(){
+            this.getCitys();
+        },
+        methods:{
+            getCitys:function(){
+                var that=this;
+                var id=GetUrlParam('id');
+                $.get('/admin/article/id',{id:id},function(res){
+                    if(res.status==2){
+                        that.descInfo=res.data[0]
+                    }else{
+                        alertModel(res.data);
+                        setTimeout(function(){
+                            window.location.href="/admin/article/list";
+                        },1000)
+                    }
+                })
+            }
+        }
+    });
+</script>

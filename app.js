@@ -7,7 +7,6 @@ const session=require('koa-session');
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
-
 const index = require('./routes/index')
 
 app.keys=['me session'];
@@ -23,10 +22,12 @@ const setConfig={
 app.use(session(setConfig,app));
 // error handler
 onerror(app)
-
 // middlewares
 app.use(bodyparser({
-  enableTypes:['json', 'form', 'text']
+  enableTypes:['json', 'form', 'text'],
+  'formLimit':'5mb',
+  'jsonLimit':'5mb',
+  'textLimit':'5mb',
 }))
 app.use(json())
 app.use(logger())
