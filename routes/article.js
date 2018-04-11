@@ -254,6 +254,24 @@ const updateArticle=async(ctx,next)=>{
         }
     });
 };
+const uploadImg=async(ctx,next)=>{
+    let gallerys=ctx.req.files.gallery;
+    let galleryData=[];
+    if(gallerys){
+        gallerys.forEach(item=>{
+            galleryData.push('/uploads/'+item.filename)
+        });
+        return ctx.body={
+            "errno": 0,
+            "data": galleryData
+        }
+    }else{
+        return ctx.body={
+            "errno": 1,
+            data:[]
+        }
+    }
+}
 
 module.exports={
     getSort,
@@ -270,5 +288,6 @@ module.exports={
     getDesc,
     deleteArticle,
     getEditArticle,
-    updateArticle
+    updateArticle,
+    uploadImg
 }

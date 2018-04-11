@@ -81,7 +81,9 @@
 <script>
     var img,editor = new window.wangEditor('#editor');
      $(function () {
-        editor.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
+        editor.customConfig.uploadFileName = 'gallery'
+        editor.customConfig.uploadImgServer = '/admin/editor/upload'
+        // editor.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
         editor.create();
     });
     //获取文章分类

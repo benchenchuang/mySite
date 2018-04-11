@@ -67,6 +67,9 @@ router.post('/admin/article/delete',Check.checkLogin,Article.deleteArticle);
 router.get('/admin/article/edit',Article.getEditArticle);
 router.post('/admin/article/edit',Article.updateArticle);
 
+
+//editor upload图片
+router.post('/admin/editor/upload',upload.fields([{ name: 'gallery', maxCount:10 }]),Article.uploadImg)
 //地址错误
 router.get('/*', async(ctx, next) => {
   await ctx.render('error', {
