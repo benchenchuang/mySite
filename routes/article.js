@@ -187,12 +187,22 @@ const getArticle=async (ctx,next)=>{
 };
 const getDesc=async (ctx,next)=>{
     let id=ctx.request.query.id;
+    let isLove='';
+    let userId='';
+    if(ctx.session.user.id){
+        userId=ctx.session.user.id;
+        isLove=await ArticleModel.findLove(userId,id).then(res=>res)
+    }
     await ArticleModel.addViews(id);
+    let count=await ArticleModel.getArticleLoves(id).then(res=>res.length);
     let article=await ArticleModel.findArticleById(id);
     if(article.length){
         return ctx.body={
             status:2,
-            data:article
+            data:article,
+            count:count,
+            loves:isLove,
+            userId:userId
         }
     }else{
         return ctx.body={
@@ -272,6 +282,41 @@ const uploadImg=async(ctx,next)=>{
         }
     }
 }
+const addLove=async (ctx,next)=>{
+    let loveData=ctx.request.body;
+    let topic=loveData.topic;
+    let user=loveData.user;
+    await ArticleModel.addArticleLove([user,topic,moment().format('YYYY-MM-DD HH:mm:ss')]).then(async res=>{
+        if(res.serverStatus){
+            return ctx.body={
+                status:2,
+                data:'点赞成功'
+            }
+        }else{
+            return ctx.body={
+                status:1,
+                data:'点赞失败'
+            } 
+        }
+    });
+}
+const cancelLove=async (ctx,next)=>{
+    let loveData=ctx.request.body;
+    let id=loveData.id;
+    await ArticleModel.cancelArticleLove(id).then(async res=>{
+        if(res.serverStatus){
+            return ctx.body={
+                status:2,
+                data:'取消成功'
+            }
+        }else{
+            return ctx.body={
+                status:1,
+                data:'取消失败'
+            } 
+        }
+    });
+}
 
 module.exports={
     getSort,
@@ -289,5 +334,7 @@ module.exports={
     deleteArticle,
     getEditArticle,
     updateArticle,
-    uploadImg
+    uploadImg,
+    addLove,
+    cancelLove
 }

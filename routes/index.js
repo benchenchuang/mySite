@@ -66,6 +66,9 @@ router.post('/admin/article/delete',Check.checkLogin,Article.deleteArticle);
 //编辑文章
 router.get('/admin/article/edit',Article.getEditArticle);
 router.post('/admin/article/edit',Article.updateArticle);
+//文章赞
+router.post('/admin/article/add_love',Check.checkLogin,Article.addLove);
+router.post('/admin/article/cancel_love',Check.checkLogin,Article.cancelLove);
 
 
 //editor upload图片

@@ -6,7 +6,10 @@
         <div class="tpl-block">
             <div class="am-g" id="desc">
                 <h2 class="am-titlebar-title" style="text-align:center;">{{descInfo.title}}</h2>
-                <p class="am-list-item-text" style="text-align:center;">作者：{{descInfo.author}} 发表时间：{{descInfo.create_time}} 浏览量：<span class="am-icon-eye font-green"> {{descInfo.views}}</span></p>
+                <p class="am-list-item-text" style="text-align:center;">作者：{{descInfo.author}} 发表时间：{{descInfo.create_time}} 浏览量：<span class="am-icon-eye font-green"> {{descInfo.views}}</span> &nbsp;&nbsp;
+                    <span class="am-icon-heart-o font-green" v-if="loves.length" @click="cancelLove(loves[0].id)"> {{count}} </span>
+                    <span class="am-icon-heart-o font-gray" v-else @click="addLove"> {{count}} </span>
+                </p>
                 <div v-html="descInfo.content" data-am-widget="paragraph" class="am-paragraph  am-paragraph-default">
                 </div>
             </div>
@@ -17,7 +20,10 @@
     new Vue({
         el:"#desc",
         data:{
-            descInfo:[]
+            descInfo:[],
+            count:0,
+            loves:'',
+            userId:''
         },
         mounted:function(){
             this.getCitys();
@@ -28,12 +34,35 @@
                 var id=GetUrlParam('id');
                 $.get('/admin/article/id',{id:id},function(res){
                     if(res.status==2){
-                        that.descInfo=res.data[0]
+                        that.descInfo=res.data[0];
+                        that.count=res.count;
+                        that.loves=res.loves
+                        that.userId=res.userId
                     }else{
                         alertModel(res.data);
                         setTimeout(function(){
                             window.location.href="/admin/article/list";
                         },1000)
+                    }
+                })
+            },
+            addLove(){
+                var self=this;
+                var id=GetUrlParam('id');
+                let userId=self.userId;
+                $.post('/admin/article/add_love',{topic:id,user:userId},function(res){
+                    alertModel(res.data);
+                    if(res.status==2){
+                        self.getCitys();
+                    }
+                })
+            },
+            cancelLove(id){
+                var self=this;
+                $.post('/admin/article/cancel_love',{id:id},function(res){
+                    alertModel(res.data);
+                    if(res.status==2){
+                        self.getCitys();
                     }
                 })
             }
