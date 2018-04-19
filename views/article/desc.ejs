@@ -2,19 +2,58 @@
 <%- include('../components/section_header.ejs') %>
 <%- include('../components/section_tabs.ejs') %>
 
-    <div class="tpl-content-wrapper tpl-portlet-components">
+    <div class="tpl-content-wrapper tpl-portlet-components" id="desc">
         <div class="tpl-block">
-            <div class="am-g" id="desc">
+            <div class="am-g">
                 <h2 class="am-titlebar-title" style="text-align:center;">{{descInfo.title}}</h2>
-                <p class="am-list-item-text" style="text-align:center;">作者：{{descInfo.author}} 发表时间：{{descInfo.create_time}} 浏览量：<span class="am-icon-eye font-green"> {{descInfo.views}}</span> &nbsp;&nbsp;
+                <p class="am-list-item-text" style="text-align:center;">作者：{{descInfo.username}} 发表时间：{{descInfo.create_time}} 浏览量：<span class="am-icon-eye font-green"> {{descInfo.views}}</span> &nbsp;&nbsp;
                     <span class="am-icon-heart-o font-green" v-if="loves.length" @click="cancelLove(loves[0].id)"> {{count}} </span>
                     <span class="am-icon-heart-o font-gray" v-else @click="addLove"> {{count}} </span>
                 </p>
                 <div v-html="descInfo.content" data-am-widget="paragraph" class="am-paragraph  am-paragraph-default">
                 </div>
             </div>
-        </div> 
-    </div>
+        </div>
+
+        <div class="tpl-content-wrapper tpl-portlet-components">
+            <div style="width:60%;margin:20px auto;">
+                <form class="am-form">
+                    <div class="am-form-group">
+                        <input type="hidden" name="reply_id" v-model="reply_id">
+                        <textarea class="" rows="5" name="user_bio" placeholder="输入评论信息" v-model="content"></textarea>
+                        <p><button type="button" class="am-btn am-btn-primary" @click="addComment">提交</button></p>
+                    </div>
+                </form> 
+                <ul class="am-comments-list am-comments-list-flip" v-if="comments.length">
+                    <li class="am-comment" v-for="comment in comments" v:key="comment">
+                        <a href="#link-to-user-home">
+                            <img src="http://www.gravatar.com/avatar/1ecedeede84abbf371b9d8d656bb4265?d=mm&s=96" alt="" class="am-comment-avatar" width="48" height="48">
+                        </a>
+                        <div class="am-comment-main">
+                            <header class="am-comment-hd">
+                                <div class="am-comment-meta">
+                                    <a href="#link-to-user" class="am-comment-author">{{comment.username}}</a> 评论于 
+                                    <time :datetime="comment.create_time" >{{comment.create_time}}</time>
+                                </div>
+                            </header>
+                            <div class="am-comment-bd">
+                                <span v-if="comment.user_id_reply!=comment.user_id && comment.user_id_reply">@ {{comment.username_reply}} </span>
+                                <p>{{comment.content}}</p>
+                            </div>
+                            <footer class="am-comment-footer">
+                                <div class="am-comment-actions" style="overflow:hidden">
+                                    <a v-if="comment.user_id==userId" href="javascript:void(0);" @click="deleteComment(comment.id)"><i class="am-icon-trash"></i> 删 除</a>
+                                    <a href="javascript:void(0);" style="float:right;" @click="reply(comment.user_id)"><i class="am-icon-reply"></i> 回 复</a>
+                                </div>
+                            </footer>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+        </div>
+    </div>  
+    
 <%- include('../components/footer.ejs') %>
 <script>
     new Vue({
@@ -23,7 +62,10 @@
             descInfo:[],
             count:0,
             loves:'',
-            userId:''
+            userId:'',
+            comments:[],
+            content:'',
+            reply_id:''
         },
         mounted:function(){
             this.getCitys();
@@ -37,7 +79,8 @@
                         that.descInfo=res.data[0];
                         that.count=res.count;
                         that.loves=res.loves
-                        that.userId=res.userId
+                        that.userId=res.userId;
+                        that.comments=res.comments;
                     }else{
                         alertModel(res.data);
                         setTimeout(function(){
@@ -60,6 +103,33 @@
             cancelLove(id){
                 var self=this;
                 $.post('/admin/article/cancel_love',{id:id},function(res){
+                    alertModel(res.data);
+                    if(res.status==2){
+                        self.getCitys();
+                    }
+                })
+            },
+            addComment(){
+                var self=this;
+                var topic=GetUrlParam('id');
+                var user=this.userId;
+                var content=this.content;
+                var reply=this.reply_id;
+                $.post('/admin/article/comment/add',{topic:topic,user:user,content:content,reply:reply},function(res){
+                    alertModel(res.data);
+                    if(res.status==2){
+                        self.getCitys();
+                    }
+                })
+            },
+            reply(id){
+                var reply_id=id;
+                this.reply_id=reply_id;
+                $('textarea[name=user_bio]').focus();
+            },
+            deleteComment(id){
+                var self=this;
+                $.post('/admin/article/comment/del',{id:id},function(res){
                     alertModel(res.data);
                     if(res.status==2){
                         self.getCitys();

@@ -121,7 +121,12 @@
                             <div class="am-form-group">
                                 <label for="user-name" class="am-u-sm-3 am-form-label">权限 / Access</label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" name="access" value="">
+                                    <div>
+                                        <select id="select_sort" name="access" data-am-selected="{btnSize: 'sm'}" style="display: none;">
+                                            <option value="0">会员</option>
+                                            <option value="1">高级管理员</option>
+                                        </select>
+                                    </div>
                                     <small>0:普通管理者,1:高级管理者</small>
                                 </div>
                             </div>
@@ -245,7 +250,12 @@
                         <div class="am-form-group">
                             <label for="user-name" class="am-u-sm-3 am-form-label">权限 / Access</label>
                             <div class="am-u-sm-9">
-                                <input type="text" name="user_access" value="${userInfo.access}">
+                                <div>
+                                    <select id="select_sort" name="user_access" data-am-selected="{btnSize: 'sm'}">
+                                        <option value="0">会员</option>
+                                        <option value="1">高级管理员</option>
+                                    </select>
+                                </div>
                                 <small>0:普通管理者,1:高级管理者</small>
                             </div>
                         </div>

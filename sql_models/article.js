@@ -28,8 +28,20 @@ create table if not exists article_love(
     PRIMARY KEY ( id )
 )ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;`
 
+const article_comment=`
+create table if not exists article_comment(
+    id INT NOT NULL AUTO_INCREMENT,
+    topic_id VARCHAR(100) DEFAULT '0' COMMENT '话题ID',
+    user_id VARCHAR(100) DEFAULT '0' COMMENT '回复用户ID',
+    user_id_reply VARCHAR(100) DEFAULT '0' COMMENT '被回复用户ID(如果为空，则回复话题发起人)',
+    content text CHARACTER SET utf8 NOT NULL,
+    create_time datetime DEFAULT NULL COMMENT '创建时间',
+    PRIMARY KEY ( id )
+)ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;`
+
 module.exports={
     sorts,
     articles,
-    article_love
+    article_love,
+    article_comment
 };

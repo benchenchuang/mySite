@@ -119,7 +119,7 @@ const createArticle=async (ctx,next)=>{
     let sort=formData.sort;
     let content=formData.content;
     let views=0;
-    let author=ctx.session.user.username;
+    let author=ctx.session.user.id;
     try{
         if(!pic){
             throw new Error("封面不能为空")
@@ -196,13 +196,15 @@ const getDesc=async (ctx,next)=>{
     await ArticleModel.addViews(id);
     let count=await ArticleModel.getArticleLoves(id).then(res=>res.length);
     let article=await ArticleModel.findArticleById(id);
+    let comments=await ArticleModel.getComments(id).then(res=>res);
     if(article.length){
         return ctx.body={
             status:2,
             data:article,
             count:count,
             loves:isLove,
-            userId:userId
+            userId:userId,
+            comments:comments
         }
     }else{
         return ctx.body={
@@ -318,6 +320,52 @@ const cancelLove=async (ctx,next)=>{
     });
 }
 
+const addComment=async(ctx,next)=>{
+    let commentData=ctx.request.body;
+    let topic=commentData.topic;
+    let userId=commentData.user;
+    let content=commentData.content;
+    let reply_id=commentData.reply;
+    try{
+        if(!content.length){
+            throw new Error('内容不能为空')
+        }
+    }catch(e){
+        return ctx.body={
+            status:0,
+            data:e.message
+        }
+    }
+    await ArticleModel.createComment([topic,userId,reply_id,content,moment().format('YYYY-MM-DD HH:mm:ss')]).then(res=>{
+        if(res.serverStatus==2){
+            return ctx.body={
+                status:2,
+                data:"评论成功"
+            }
+        }else{
+            return ctx.body={
+                status:1,
+                data:"评论失败"
+            }
+        }
+    })
+}
+const delComment=async(ctx,next)=>{
+    let commentId=ctx.request.body.id;
+    await ArticleModel.delComment(commentId).then(res=>{
+        if(res.serverStatus==2){
+            return ctx.body={
+                status:2,
+                data:"删除成功"
+            }
+        }else{
+            return ctx.body={
+                status:1,
+                data:"删除失败"
+            } 
+        }
+    })
+}
 module.exports={
     getSort,
     createSort,
@@ -336,5 +384,7 @@ module.exports={
     updateArticle,
     uploadImg,
     addLove,
-    cancelLove
+    cancelLove,
+    addComment,
+    delComment
 }
