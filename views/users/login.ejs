@@ -31,20 +31,43 @@
 </div>
 <%- include('../components/footer.ejs') %>
 <script>
+    var webReferrer=document.referrer || '';
     $('button.am_submit').click(function(){
+        login();
+    });
+
+    $('body').keydown(function(event){
+        if(event.keyCode=='13'){
+            login();
+        }
+    })
+    function login(){
         var formData=$("form.am-form").serialize();
-        $.post('/admin/login',formData,function(res){
-            if(res.status==2){
-                alertModel(res.data);
-                setTimeout(function(){
-                    window.location.href="/admin"
-                },1500)
-            }else{
-                alertModel(res.data);
-                mathCode();
+        $.ajax({
+            url:'/admin/login',
+            type:"POST",
+            data:formData,
+            headers: {'Authorization': 'token'},
+            success:function(res){
+                if(res.status==2){
+                    alertModel(res.data);
+                    // setCookie('x-access-token',res.token,2);
+                    if(webReferrer){
+                        setTimeout(function(){
+                            window.location.href=webReferrer
+                        },1500)
+                    }else{
+                        setTimeout(function(){
+                            window.location.href=webReferrer
+                        },1500)
+                    }
+                }else{
+                    alertModel(res.data);
+                    mathCode();
+                } 
             }
         })
-    });
+    }
 
     $('#code').click(function(){
         mathCode();
@@ -53,4 +76,5 @@
     function mathCode(){
         $('#code').attr('src','/admin/code?'+Math.random());
     }
+
 </script>

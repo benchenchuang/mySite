@@ -1,0 +1,16 @@
+{
+    "app":[{
+        "name":"mySite",
+        "script":"app.js"
+    }],
+    "deploy":{
+        "production":{
+            "user":"benchenchuang",
+            "host":["192.168.2.71"],
+            "ref":"origin/master",
+            "repo":"git@github.com:benchenchuang/newTest.git",
+            "path":"/var/www/my-repository",
+            "post-deploy":"npm install; grunt dist"
+        }
+    }
+}

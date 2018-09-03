@@ -98,6 +98,7 @@
                         $.get(url,{page:num,limit:limit,sort:sort,title:title},function(res){
                             var trData='';
                             var multiple=(num-1)*limit;
+                            console.log(res.data)
                             res.data.forEach(function(item,index){
                                 trData+=`<div class="am-u-sm-12 am-u-md-6 am-u-lg-4">
                                         <div class="tpl-table-images-content">
@@ -113,6 +114,7 @@
                                                 <div class="tpl-i-more">
                                                     <ul>
                                                         <li><span class="am-icon-eye font-green"> ${item.views}</span></li>
+                                                        <li><span class="am-icon-edit font-green"> ${item.reply_count}</span></li>
                                                     </ul>
                                                 </div>
                                                 <div class="am-btn-toolbar">

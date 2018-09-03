@@ -4,6 +4,7 @@ const Home=require('./home');
 const Users=require('./users');
 const Customer=require('./customer');
 const Article=require('./article');
+const Token=require('../middlewares/token');
 // 上传图片的中间件
 const multer=require('koa-multer');
 //配置  
@@ -21,7 +22,7 @@ var storage = multer.diskStorage({
 //加载配置  
 var upload = multer({ storage: storage }); 
 
-router.get('/admin',Check.checkLogin,Home.getHome)
+router.get('/admin',Token.checkToken,Check.checkLogin,Home.getHome)
 // 登录
 router.get('/admin/login',Check.checkNotLogin,Users.getLogin);
 router.post('/admin/login',Users.postLogin);
@@ -33,12 +34,12 @@ router.get('/admin/code',Users.getCode);
 //退出
 router.get('/admin/out',Users.getOut);
 //修改信息
-router.get('/admin/info',Check.checkLogin,Users.getInfo);
+router.get('/admin/info',Token.checkToken,Check.checkLogin,Users.getInfo);
 router.post('/admin/info',Check.checkLogin,Users.postInfo);
 //会员管理
-router.get('/admin/customers',Check.checkLogin,Customer.customerModel);
-router.get('/admin/customersData',Check.checkLogin,Customer.getCustomers);
-router.get('/admin/customer',Check.checkLogin,Customer.getCustomer);
+router.get('/admin/customers',Token.checkToken,Check.checkLogin,Customer.customerModel);
+router.get('/admin/customersData',Token.checkToken,Check.checkLogin,Customer.getCustomers);
+router.get('/admin/customer',Token.checkToken,Check.checkLogin,Customer.getCustomer);
 //删除会员
 router.post('/admin/customer/delete',Check.checkLogin,Customer.deleteCustomer);
 

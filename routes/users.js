@@ -2,11 +2,12 @@ const UserModel=require('../lib/mysql');
 const md5=require('md5');
 const moment=require('moment');
 const captchapng=require('captchapng');
+const Token=require('../middlewares/token');
 //登录
 const getLogin=async (ctx,next)=>{
   await ctx.render('users/login',{
     title:'登录'
-  })
+  });
 }
 const postLogin=async (ctx,next)=>{
   let formData=ctx.request.body;
@@ -14,7 +15,6 @@ const postLogin=async (ctx,next)=>{
   let password=formData.password;
   let code=formData.code;
   let oldCode=ctx.session.code;
-
   try{
     if(!username){
       throw new Error('用户名不能为空')
@@ -31,16 +31,25 @@ const postLogin=async (ctx,next)=>{
       data:e.message
     }
   }
+  
   password=md5(password);
   await UserModel.findByName(username).then(async res=>{
     if(res.length){
       var user=res[0];
       if(user.password==password){
         user.password="";
+        let token=Token.createToken(username);
+        await UserModel.updateUserToken(token,user.id).then(async res=>{
+          if(res.affectedRows){
+            console.log('token存储成功')
+          }
+        });
+        ctx.session.token=token;
         ctx.session.user=user;
         return ctx.body={
           status:2,
-          data:'登录成功'
+          data:'登录成功',
+          token:token
         }
       }else{
         return ctx.body={
@@ -48,7 +57,6 @@ const postLogin=async (ctx,next)=>{
           data:"密码不正确"
         }
       }
-      console.log(user)
     }else{
       return ctx.body={
         status:4,
@@ -56,8 +64,6 @@ const postLogin=async (ctx,next)=>{
       }
     }
   })
-
-
 };
 //注册
 const getRegister=async (ctx,next)=>{
@@ -127,6 +133,7 @@ const getCode=async (ctx,next)=>{
 //退出
 const getOut=async (ctx,next)=>{
   ctx.session.user="";
+  ctx.session.token="";
   return ctx.redirect('/admin/login');
 };
 //修改信息

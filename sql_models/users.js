@@ -4,6 +4,7 @@ create table if not exists users(
     username VARCHAR(100) NOT NULL,
     password VARCHAR(100) NOT NULL,
     phone VARCHAR(100) NOT NULL,
+    token VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     qq VARCHAR(100) NOT NULL,
     access VARCHAR(100) default '0',

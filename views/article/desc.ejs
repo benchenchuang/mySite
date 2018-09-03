@@ -74,20 +74,43 @@
             getCitys:function(){
                 var that=this;
                 var id=GetUrlParam('id');
-                $.get('/admin/article/id',{id:id},function(res){
-                    if(res.status==2){
-                        that.descInfo=res.data[0];
-                        that.count=res.count;
-                        that.loves=res.loves
-                        that.userId=res.userId;
-                        that.comments=res.comments;
-                    }else{
-                        alertModel(res.data);
-                        setTimeout(function(){
-                            window.location.href="/admin/article/list";
-                        },1000)
+                $.ajax({
+                    url:"/admin/article/id",
+                    type:"GET",
+                    data:{id:id},
+                    headers: {'Authorization': '1213213213'},
+                    beforeSend: function(request){
+                        request.setRequestHeader('Authorization', 'Bearer21231213 ');
+                    },
+                    success:function(res){
+                        if(res.status==2){
+                            that.descInfo=res.data[0];
+                            that.count=res.count;
+                            that.loves=res.loves
+                            that.userId=res.userId;
+                            that.comments=res.comments;
+                        }else{
+                            alertModel(res.data);
+                            setTimeout(function(){
+                                window.location.href="/admin/article/list";
+                            },1000)
+                        }
                     }
                 })
+                // $.get('/admin/article/id',{id:id},function(res){
+                //     if(res.status==2){
+                //         that.descInfo=res.data[0];
+                //         that.count=res.count;
+                //         that.loves=res.loves
+                //         that.userId=res.userId;
+                //         that.comments=res.comments;
+                //     }else{
+                //         alertModel(res.data);
+                //         setTimeout(function(){
+                //             window.location.href="/admin/article/list";
+                //         },1000)
+                //     }
+                // })
             },
             addLove(){
                 var self=this;
@@ -118,6 +141,7 @@
                 $.post('/admin/article/comment/add',{topic:topic,user:user,content:content,reply:reply},function(res){
                     alertModel(res.data);
                     if(res.status==2){
+                        self.content='';
                         self.getCitys();
                     }
                 })
