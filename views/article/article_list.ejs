@@ -103,6 +103,7 @@
                             res.data.forEach(function(item,index){
                                 trData+=`<div class="am-u-sm-12 am-u-md-6 am-u-lg-4">
                                         <div class="tpl-table-images-content">
+                                            <div class="tpl-table-images-content-i-time">类型：${item.sort_name}</div>
                                             <div class="tpl-table-images-content-i-time">发布时间：${item.create_time}</div>
                                             <div class="tpl-i-title">
                                                 ${item.title}
@@ -111,6 +112,7 @@
                                                 <span class="tpl-table-images-content-i-shadow"></span>
                                                 <img src="/uploads/${item.pic}" alt="">
                                             </a>
+                                            
                                             <div class="tpl-table-images-content-block">
                                                 <div class="tpl-i-more">
                                                     <ul>
