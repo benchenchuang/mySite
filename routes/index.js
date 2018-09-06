@@ -1,3 +1,6 @@
+// const router = require('koa-router')({
+//   prefix:'/v1.0'
+// });//可以添加版本号/v1.0/admin。。。。
 const router = require('koa-router')();
 const Check=require('../middlewares/check');
 const Home=require('./home');

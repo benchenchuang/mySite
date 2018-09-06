@@ -11,6 +11,7 @@ const getLogin=async (ctx,next)=>{
 }
 const postLogin=async (ctx,next)=>{
   let formData=ctx.request.body;
+  console.log(formData)
   let username=formData.username;
   let password=formData.password;
   let code=formData.code;
@@ -19,8 +20,14 @@ const postLogin=async (ctx,next)=>{
     if(!username){
       throw new Error('用户名不能为空')
     }
+    if(!password){
+      throw new Error('密码不能为空')
+    }
     if(password.length<3){
       throw new Error('密码不能少于3位数')
+    }
+    if(!code){
+      throw new Error('验证码不能为空')
     }
     if(code!=oldCode){
       throw new Error('验证码不正确')
